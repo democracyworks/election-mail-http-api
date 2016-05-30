@@ -27,7 +27,26 @@
                                                        "application/transit+msgpack"
                                                        "application/json"
                                                        "text/plain"])]
-     ["/ping" {:get [:ping ping]}]]]])
+     ["/ping" {:get [:ping ping]}]
+     ["/subscriptions/:user-id"
+      ^:interceptors [(bifrost.i/update-in-request
+                       [:path-params :user-id]
+                       #(java.util.UUID/fromString %))
+                      (bifrost.i/update-in-response
+                       [:body :subscription]
+                       [:body] identity)]
+      {:get [:subscription-read
+             (bifrost/interceptor
+              channels/subscription-read)]
+       :put [:subscription-create
+             (bifrost/interceptor
+              channels/subscription-create)]
+       :delete [:subscription-delete
+                (bifrost/interceptor
+                 channels/subscription-delete)]}]
+     ["/mailing-forms" {:put [:mailing-forms
+                              (bifrost/interceptor
+                               channels/mailing-forms)]}]]]])
 
 (defn service []
   {::env :prod
