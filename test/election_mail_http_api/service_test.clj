@@ -10,7 +10,7 @@
             [bifrost.core :as bifrost])
   (:import [java.io ByteArrayInputStream]))
 
-(def test-server-port 65342) ; FIXME: Pick a port unique to this project
+(def test-server-port 65342)
 
 (defn run-test-server [run-tests]
   (let [service-map
@@ -18,7 +18,7 @@
     (run-tests)
     (io.pedestal.http/stop service-map)))
 
-(use-fixtures :each run-test-server)
+(use-fixtures :once run-test-server)
 
 (def root-url (str "http://localhost:" test-server-port))
 
