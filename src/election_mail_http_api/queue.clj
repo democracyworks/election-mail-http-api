@@ -22,32 +22,32 @@
           external-services [(wire-up/external-service
                               connection
                               ""
-                              "election-mail-http-api.mailing.forms"
-                              (config [:rabbitmq :queues "election-mail-http-api.mailing.forms"])
+                              "election-mail-works.mailing.forms"
+                              (config [:rabbitmq :queues "election-mail-works.mailing.forms"])
                               (config [:timeouts :mailing-forms])
                               channels/mailing-forms)
 
                              (wire-up/external-service
                               connection
                               ""
-                              "election-mail-http-api.subscription.read"
-                              (config [:rabbitmq :queues "election-mail-http-api.subscription.read"])
+                              "election-mail-works.subscription.read"
+                              (config [:rabbitmq :queues "election-mail-works.subscription.read"])
                               (config [:timeouts :subscription-read])
                               channels/subscription-read)
 
                              (wire-up/external-service
                               connection
                               ""
-                              "election-mail-http-api.subscription.create"
-                              (config [:rabbitmq :queues "election-mail-http-api.subscription.create"])
+                              "election-mail-works.subscription.create"
+                              (config [:rabbitmq :queues "election-mail-works.subscription.create"])
                               (config [:timeouts :subscription-create])
                               channels/subscription-create)
 
                              (wire-up/external-service
                               connection
                               ""
-                              "election-mail-http-api.subscription.delete"
-                              (config [:rabbitmq :queues "election-mail-http-api.subscription.delete"])
+                              "election-mail-works.subscription.delete"
+                              (config [:rabbitmq :queues "election-mail-works.subscription.delete"])
                               (config [:timeouts :subscription-delete])
                               channels/subscription-delete)]
           outgoing-events []]
@@ -56,7 +56,7 @@
                                 channels/ok-responses
                                 handlers/ok)
 
-      
+
       {:connections [connection]
        :channels (vec (concat
                        incoming-events
