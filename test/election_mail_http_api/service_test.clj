@@ -105,23 +105,22 @@
         (assert (not= http-response ::timeout))
         (is (= 500 (:status http-response))))))
   (testing "no response from backend service results in HTTP gateway timeout error response"
-    (with-redefs [bifrost/*response-timeout* 500]
-      (let [fake-user-id (java.util.UUID/randomUUID)
-            http-response-ch (async/thread
-                               (http/put (str/join "/" [root-url
-                                                        "subscriptions"
-                                                        fake-user-id])
-                                         {:headers {:accept "application/edn"}
-                                          :form-params {:subscribe true}
-                                          :content-type :edn
-                                          :throw-exceptions false}))
-            [response-ch message] (async/alt!! channels/subscription-create ([v] v)
-                                               (async/timeout 1000) [nil ::timeout])]
-        (assert (not= message ::timeout))
-        (let [http-response (async/alt!! http-response-ch ([v] v)
-                                         (async/timeout 1000) ::timeout)]
-          (assert (not= http-response ::timeout))
-          (is (= 504 (:status http-response))))))))
+    (let [fake-user-id (java.util.UUID/randomUUID)
+          http-response-ch (async/thread
+                             (http/put (str/join "/" [root-url
+                                                      "subscriptions"
+                                                      fake-user-id])
+                                       {:headers {:accept "application/edn"}
+                                        :form-params {:subscribe true}
+                                        :content-type :edn
+                                        :throw-exceptions false}))
+          [response-ch message] (async/alt!! channels/subscription-create ([v] v)
+                                             (async/timeout 1000) [nil ::timeout])]
+      (assert (not= message ::timeout))
+      (let [http-response (async/alt!! http-response-ch ([v] v)
+                                       (async/timeout 11000) ::timeout)]
+        (assert (not= http-response ::timeout))
+        (is (= 504 (:status http-response)))))))
 
 (deftest delete-subscription-test
   (testing "DELETE to /subscriptions/:user-id puts appropriate create message
