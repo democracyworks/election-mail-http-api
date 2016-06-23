@@ -39,23 +39,20 @@
                                                   "subscriptions"
                                                   fake-user-id])
                                        {:headers {:accept "application/edn"}
-                                        :form-params {:subscribe true}
                                         :content-type :edn}))
           [response-ch message] (async/alt!!
                                   channels/subscription-create ([v] v)
                                   (async/timeout 1000) [nil ::timeout])]
       (assert (not= message ::timeout))
-      (is (= {:user-id fake-user-id
-              :subscribe true}
+      (is (= {:user-id fake-user-id}
              message))
       (async/>!! response-ch {:status :ok
-                              :subscription {:user-id fake-user-id
-                                             :subscribed true}})
+                              :subscription {:user-id fake-user-id}})
       (let [http-response (async/alt!! http-response-ch ([v] v)
                                        (async/timeout 1000) ::timeout)]
         (assert (not= http-response ::timeout))
         (is (= 200 (:status http-response)))
-        (is (= {:user-id fake-user-id, :subscribed true}
+        (is (= {:user-id fake-user-id}
                (-> http-response :body edn/read-string))))))
   (testing "PUT to /subscriptions/:user-id can respond with Transit"
     (let [fake-user-id (java.util.UUID/randomUUID)
@@ -65,14 +62,12 @@
                                              "subscriptions"
                                              fake-user-id])
                               {:headers {:accept "application/transit+json"}
-                               :form-params {:subscribe true}
                                :content-type :edn}))
           [response-ch message] (async/alt!! channels/subscription-create ([v] v)
                                              (async/timeout 1000) [nil ::timeout])]
       (assert (not= message ::timeout))
       (async/>!! response-ch {:status :ok
-                              :subscription {:user-id fake-user-id
-                                              :subscribed true}})
+                              :subscription {:user-id fake-user-id}})
       (let [http-response (async/alt!! http-response-ch ([v] v)
                                        (async/timeout 1000) ::timeout)
             transit-in (ByteArrayInputStream. (-> http-response
@@ -82,9 +77,8 @@
             create-data (transit/read transit-reader)]
         (assert (not= http-response ::timeout))
         (is (= fake-user-id (:user-id message)))
-        (is (:subscribe message))
         (is (= 200 (:status http-response)))
-        (is (= {:user-id fake-user-id, :subscribed true} create-data)))))
+        (is (= {:user-id fake-user-id} create-data)))))
   (testing "error from backend service results in HTTP server error response"
     (let [fake-user-id (java.util.UUID/randomUUID)
           http-response-ch (async/thread
@@ -92,7 +86,6 @@
                                                       "subscriptions"
                                                       fake-user-id])
                                        {:headers {:accept "application/edn"}
-                                        :form-params {:subscribe true}
                                         :content-type :edn
                                         :throw-exceptions false}))
           [response-ch message] (async/alt!! channels/subscription-create ([v] v)
@@ -106,7 +99,7 @@
         (is (= 500 (:status http-response)))))))
 
 (deftest delete-subscription-test
-  (testing "DELETE to /subscriptions/:user-id puts appropriate create message
+  (testing "DELETE to /subscriptions/:user-id puts appropriate message
             on subscription-delete channel"
     (let [fake-user-id (java.util.UUID/randomUUID)
           http-response-ch (async/thread
@@ -140,14 +133,13 @@
                                              (async/timeout 1000) [nil ::timeout])]
       (assert (not= message ::timeout))
       (async/>!! response-ch {:status :ok
-                              :subscription {:user-id fake-user-id
-                                             :subscribed true}})
+                              :subscription {:user-id fake-user-id}})
       (let [http-response (async/alt!! http-response-ch ([v] v)
                                        (async/timeout 1000) ::timeout)]
         (assert (not= http-response ::timeout))
         (is (= fake-user-id (:user-id message)))
         (is (= 200 (:status http-response)))
-        (is (= {:user-id fake-user-id, :subscribed true}
+        (is (= {:user-id fake-user-id}
                (-> http-response :body edn/read-string)))))))
 
 (deftest test-mailing-forms
