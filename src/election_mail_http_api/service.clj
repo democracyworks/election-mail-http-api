@@ -48,7 +48,7 @@
                  channels/subscription-delete)]}]
      ["/mailing-forms" {:put [:mailing-forms
                               (bifrost/interceptor
-                               channels/mailing-forms)]}]]]])
+                               channels/mailing-forms 40000)]}]]]])
 
 (defn service []
   (let [allowed-origins (config [:server :allowed-origins])]
