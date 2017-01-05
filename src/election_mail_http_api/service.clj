@@ -39,16 +39,20 @@
                        [:body] identity)]
       {:get [:subscription-read
              (bifrost/interceptor
-              channels/subscription-read)]
+              channels/subscription-read
+              (config [:timeouts :subscription-read]))]
        :put [:subscription-create
              (bifrost/interceptor
-              channels/subscription-create)]
+              channels/subscription-create
+              (config [:timeouts :subscription-create]))]
        :delete [:subscription-delete
                 (bifrost/interceptor
-                 channels/subscription-delete)]}]
+                 channels/subscription-delete
+                 (config [:timeouts :subscription-delete]))]}]
      ["/mailing-forms" {:put [:mailing-forms
                               (bifrost/interceptor
-                               channels/mailing-forms 40000)]}]]]])
+                               channels/mailing-forms
+                               (config [:timeouts :mailing-forms]))]}]]]])
 
 (defn service []
   (let [allowed-origins (config [:server :allowed-origins])]
