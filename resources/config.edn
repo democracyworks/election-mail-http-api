@@ -3,11 +3,31 @@
           :allowed-origins #resource-config/edn #resource-config/env "ALLOWED_ORIGINS"}
  :rabbitmq {:connection {:host #resource-config/env "RABBITMQ_PORT_5672_TCP_ADDR"
                          :port #resource-config/edn #resource-config/env "RABBITMQ_PORT_5672_TCP_PORT"}
-            :queues {"election-mail-http-api.ok" {:exclusive false :durable true :auto-delete false}
-                     "election-mail-works.mailing.forms" {:exclusive false :durable true :auto-delete false}
-                     "election-mail-works.subscription.read" {:exclusive false :durable true :auto-delete false}
-                     "election-mail-works.subscription.create" {:exclusive false :durable true :auto-delete false}
-                     "election-mail-works.subscription.delete" {:exclusive false :durable true :auto-delete false}}}
+            :kehaar {:incoming-services
+                     [{:queue "election-mail-http-api.ok"
+                       :f election-mail-http-api.handlers/ok
+                       :response true
+                       :threads 2
+                       :prefetch-limit 2}]
+
+                     :external-services
+                     [{:queue "election-mail-works.mailing.forms"
+                       :channel election-mail-http-api.channels/mailing-forms
+                       :response true
+                       :timeout 40000}
+                      {:queue "election-mail-works.subscription.read"
+                       :channel election-mail-http-api.channels/subscription-read
+                       :response true
+                       :timeout 40000}
+                      {:queue "election-mail-works.subscription.create"
+                       :channel election-mail-http-api.channels/subscription-create
+                       :response true
+                       :timeout 40000}
+                      {:queue "election-mail-works.subscription.delete"
+                       :channel election-mail-http-api.channels/subscription-delete
+                       :response true
+                       :timeout 40000}]}}
+
  :timeouts {:mailing-forms 40000
             :subscription-read 40000
             :subscription-create 40000
