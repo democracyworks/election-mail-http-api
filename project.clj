@@ -24,7 +24,12 @@
                  [io.pedestal/pedestal.immutant "0.4.1"]
                  [org.immutant/core "2.1.4"]
                  [democracyworks/bifrost "0.1.5"]]
-  :plugins [[lein-immutant "2.1.0"]]
+  :java-agents [[com.newrelic.agent.java/newrelic-agent "3.35.1"]]
+  :plugins [[lein-immutant "2.1.0"]
+            [com.carouselapps/jar-copier "0.3.0"]]
+  :jar-copier {:java-agents true
+               :destination "resources/jars"}
+  :prep-tasks ["javac" "compile" "jar-copier"]
   :main ^:skip-aot election-mail-http-api.server
   :uberjar-name "election-mail-http-api.jar"
   :profiles {:uberjar {:aot :all}
