@@ -16,7 +16,7 @@
 
   <logger name="election-mail-http-api" level="${log-level:-DEBUG}"/>
 
-  <root level="INFO">
+  <root level="${log-level:-INFO}">
     <appender-ref ref="Console"/>
   </root>
 </configuration>

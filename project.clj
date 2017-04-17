@@ -34,5 +34,5 @@
   :uberjar-name "election-mail-http-api.jar"
   :profiles {:uberjar {:aot :all}
              :dev {:resource-paths ["dev-resources"]}
-                    :jvm-opts ["-Dlog-level=INFO"]}})
              :test {:dependencies [[clj-http "3.5.0"]]
+                    :jvm-opts ["-Dlog-level=OFF"]}})
